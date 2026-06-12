@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { Sparkles, Loader2, Check, X } from "lucide-react"
 import { useAppStore } from "@/store/useAppStore"
 import { getAPIKey } from "@/lib/storage/apiKeys"
@@ -17,12 +17,17 @@ const GENERATION_MESSAGES = [
 const MESSAGE_INTERVAL = 3000
 
 export default function GenerateButton() {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+
   const selectedProvider = useAppStore((s) => s.selectedProvider)
   const isGenerating = useAppStore((s) => s.isGenerating)
+  const setIsGenerating = useAppStore((s) => s.setIsGenerating)
   const prompt = useAppStore((s) => s.currentPrompt)
   const storeKey = useAppStore((s) => s.apiKeys[s.selectedProvider])
-  // Check both Zustand store and localStorage (backward compat with existing saved keys)
-  const hasKey = !!storeKey || !!getAPIKey(selectedProvider)
+
+  // Guard against hydration mismatch: only read localStorage after mount
+  const hasKey = mounted && (!!storeKey || !!getAPIKey(selectedProvider))
 
   const providerMeta = getProvider(selectedProvider)
 
@@ -55,6 +60,12 @@ export default function GenerateButton() {
       return () => clearTimeout(t)
     }
   }, [isGenerating, status])
+
+  const handleClick = useCallback(() => {
+    if (!hasKey) return
+    if (!prompt.trim()) return
+    setIsGenerating(true)
+  }, [hasKey, prompt, setIsGenerating])
 
   const disabled = !hasKey || !prompt.trim() || isGenerating
 
@@ -98,6 +109,7 @@ export default function GenerateButton() {
     <div className="relative group">
       <button
         disabled={disabled}
+        onClick={handleClick}
         className={
           status === "generating"
             ? "w-full bg-[#333333] text-[#888888] text-sm font-medium rounded-full py-3 flex items-center justify-center gap-2 cursor-not-allowed"
@@ -114,7 +126,7 @@ export default function GenerateButton() {
       </button>
 
       {/* Provider status tooltip */}
-      {hasKey && providerMeta && (
+      {mounted && hasKey && providerMeta && (
         <div className="absolute -top-1 left-1/2 -translate-x-1/2 translate-y-[-100%] opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 mb-2">
           <div className="bg-[#1A1A1A] border border-[#333333] rounded-lg px-3 py-2 shadow-xl shadow-black/30 whitespace-nowrap">
             <div className="flex items-center gap-2">
@@ -129,13 +141,12 @@ export default function GenerateButton() {
               </p>
             )}
           </div>
-          {/* Arrow */}
           <div className="w-2 h-2 bg-[#1A1A1A] border-r border-b border-[#333333] rotate-45 mx-auto -mt-1" />
         </div>
       )}
 
       {/* No key tooltip */}
-      {!hasKey && (
+      {mounted && !hasKey && (
         <div className="absolute -top-1 left-1/2 -translate-x-1/2 translate-y-[-100%] opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 mb-2">
           <div className="bg-[#1A1A1A] border border-[#333333] rounded-lg px-3 py-2 shadow-xl shadow-black/30 whitespace-nowrap">
             <p className="text-[10px] text-yellow-500">

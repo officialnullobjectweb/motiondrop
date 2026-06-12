@@ -18,9 +18,9 @@ export default function Home() {
 
       <Navbar />
       <main id="main-content" className="flex-1 snap-y snap-mandatory" role="main">
-        <section className="snap-start snap-always min-h-screen"><Hero /></section>
-        <section className="snap-start snap-always min-h-screen"><ExampleAnimations /></section>
-        <section className="snap-start snap-always min-h-screen"><HowItWorks /></section>
+        <section className="snap-start snap-always"><Hero /></section>
+        <section className="snap-start snap-always"><ExampleAnimations /></section>
+        <section className="snap-start snap-always"><HowItWorks /></section>
         <section className="snap-start snap-always"><SitemapSection /></section>
       </main>
       <Footer />
