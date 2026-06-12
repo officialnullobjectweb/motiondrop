@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { useAppStore } from "@/store/useAppStore"
 import { getAPIKey } from "@/lib/storage/apiKeys"
 import { PROVIDERS } from "@/constants/providers"
@@ -9,22 +9,24 @@ import type { ProviderName } from "@/lib/types/animation"
 export default function ProviderSelector() {
   const selected = useAppStore((s) => s.selectedProvider)
   const setSelected = useAppStore((s) => s.setSelectedProvider)
+  const storeKeys = useAppStore((s) => s.apiKeys)
   const [available, setAvailable] = useState<ProviderName[]>([])
 
-  useEffect(() => {
-    const withKeys = PROVIDERS.filter((p) => getAPIKey(p.id))
+  const updateAvailable = useCallback(() => {
+    const withKeys = PROVIDERS.filter((p) => getAPIKey(p.id) || storeKeys[p.id])
     setAvailable(withKeys.map((p) => p.id))
-  }, [])
+  }, [storeKeys])
 
-  // Also re-check on window focus (user might have added a key in another tab)
   useEffect(() => {
-    const onFocus = () => {
-      const withKeys = PROVIDERS.filter((p) => getAPIKey(p.id))
-      setAvailable(withKeys.map((p) => p.id))
-    }
+    updateAvailable()
+  }, [updateAvailable])
+
+  // Re-check on window focus too
+  useEffect(() => {
+    const onFocus = () => updateAvailable()
     window.addEventListener("focus", onFocus)
     return () => window.removeEventListener("focus", onFocus)
-  }, [])
+  }, [updateAvailable])
 
   if (available.length <= 1) return null
 

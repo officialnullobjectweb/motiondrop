@@ -6,6 +6,7 @@ import { useAPIKey } from "@/hooks/useAPIKey"
 import { useAppStore } from "@/store/useAppStore"
 import { PROVIDERS, getProvider } from "@/constants/providers"
 import { toastSuccess, toastError, toastInfo } from "@/lib/toast"
+import { testProviderConnection, getTestErrorMessage } from "@/lib/ai/testConnection"
 import type { ProviderName } from "@/lib/types/animation"
 
 export default function APIKeyInput() {
@@ -42,91 +43,15 @@ export default function APIKeyInput() {
     setTestResult("testing")
 
     try {
-      const provider = localProvider
-      // Make a minimal API call to verify the key works
-      let ok = false
-      let errMsg = ""
+      const result = await testProviderConnection(localProvider, localKey)
 
-      if (provider === "gemini") {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(localKey.trim())}`
-        const res = await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: "Say 'ok' if you can read this." }] }],
-          }),
-        })
-        ok = res.ok
-        if (!ok) errMsg = `Error ${res.status}`
-      } else if (provider === "groq") {
-        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localKey.trim()}`,
-          },
-          body: JSON.stringify({
-            model: "llama-3.1-70b-versatile",
-            messages: [{ role: "user", content: "Say 'ok'" }],
-            max_tokens: 10,
-          }),
-        })
-        ok = res.ok
-        if (!ok) errMsg = `Error ${res.status}`
-      } else if (provider === "openrouter") {
-        const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localKey.trim()}`,
-          },
-          body: JSON.stringify({
-            model: "gpt-4o-mini",
-            messages: [{ role: "user", content: "Say 'ok'" }],
-            max_tokens: 10,
-          }),
-        })
-        ok = res.ok
-        if (!ok) errMsg = `Error ${res.status}`
-      } else if (provider === "openai") {
-        const res = await fetch("https://api.openai.com/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localKey.trim()}`,
-          },
-          body: JSON.stringify({
-            model: "gpt-4o-mini",
-            messages: [{ role: "user", content: "Say 'ok'" }],
-            max_tokens: 10,
-          }),
-        })
-        ok = res.ok
-        if (!ok) errMsg = `Error ${res.status}`
-      } else if (provider === "anthropic") {
-        const res = await fetch("https://api.anthropic.com/v1/messages", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": localKey.trim(),
-            "anthropic-version": "2023-06-01",
-          },
-          body: JSON.stringify({
-            model: "claude-3-haiku-20240307",
-            max_tokens: 10,
-            messages: [{ role: "user", content: "Say 'ok'" }],
-          }),
-        })
-        ok = res.ok
-        if (!ok) errMsg = `Error ${res.status}`
-      }
-
-      if (ok) {
+      if (result.ok) {
         setTestResult("pass")
         toastSuccess(`✓ ${localProviderMeta?.name} connection successful`)
       } else {
         setTestResult("fail")
-        toastError(`Connection failed: ${errMsg}. Check your key.`)
+        const msg = getTestErrorMessage(result)
+        toastError(`Connection failed: ${msg}`)
       }
     } catch (err) {
       setTestResult("fail")
