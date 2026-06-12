@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { Sparkles, Loader2, Check, X } from "lucide-react"
 import { useAppStore } from "@/store/useAppStore"
+import { getAPIKey } from "@/lib/storage/apiKeys"
 
 const GENERATION_MESSAGES = [
   "Reading your prompt...",
@@ -15,9 +16,12 @@ const GENERATION_MESSAGES = [
 const MESSAGE_INTERVAL = 3000
 
 export default function GenerateButton() {
+  const selectedProvider = useAppStore((s) => s.selectedProvider)
   const isGenerating = useAppStore((s) => s.isGenerating)
   const prompt = useAppStore((s) => s.currentPrompt)
-  const hasKey = useAppStore((s) => !!s.apiKeys[s.selectedProvider])
+  const storeKey = useAppStore((s) => s.apiKeys[s.selectedProvider])
+  // Check both Zustand store and localStorage (backward compat with existing saved keys)
+  const hasKey = !!storeKey || !!getAPIKey(selectedProvider)
 
   const [status, setStatus] = useState<"idle" | "generating" | "success" | "error">("idle")
   const [msgIndex, setMsgIndex] = useState(0)

@@ -18,6 +18,8 @@ export default function APIKeyInput() {
 
   const selectedProvider = useAppStore((s) => s.selectedProvider)
   const setSelectedProvider = useAppStore((s) => s.setSelectedProvider)
+  const setApiKeys = useAppStore((s) => s.setApiKeys)
+  const storeApiKeys = useAppStore((s) => s.apiKeys)
   const { apiKey, setKey, clearKey, hasKey } = useAPIKey(selectedProvider)
 
   const currentProvider = getProvider(selectedProvider)
@@ -141,21 +143,27 @@ export default function APIKeyInput() {
     }
     setSelectedProvider(localProvider)
     setKey(localKey.trim())
+    // Sync with Zustand store so GenerateButton picks it up immediately
+    setApiKeys({ ...storeApiKeys, [localProvider]: localKey.trim() })
     setModalOpen(false)
     setShowKey(false)
     setLocalKey("")
     setTestResult("idle")
     toastSuccess(`${localProviderMeta?.name} API key saved`)
-  }, [localKey, localProvider, localProviderMeta, setKey, setSelectedProvider])
+  }, [localKey, localProvider, localProviderMeta, setKey, setSelectedProvider, setApiKeys, storeApiKeys])
 
   const handleClear = useCallback(() => {
     clearKey()
+    // Remove from Zustand store
+    const updated = { ...storeApiKeys }
+    delete updated[localProvider]
+    setApiKeys(updated)
     setModalOpen(false)
     setShowKey(false)
     setLocalKey("")
     setTestResult("idle")
     toastInfo("API key removed")
-  }, [clearKey])
+  }, [clearKey, localProvider, setApiKeys, storeApiKeys])
 
   function maskKey(key: string): string {
     if (key.length <= 8) return "••••••••"

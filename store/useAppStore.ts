@@ -2,6 +2,20 @@ import { create } from "zustand"
 import type { AnimationConfig, KeyframeData, AspectRatio, ProviderName } from "@/lib/types/animation"
 import type { HistoryItem } from "@/lib/types/config"
 
+// Load persisted API keys from localStorage at store creation time
+function loadPersistedKeys(): Record<string, string> {
+  if (typeof window === "undefined") return {}
+  try {
+    const raw = localStorage.getItem("motiondrop_apikeys")
+    if (!raw) return {}
+    const parsed = JSON.parse(raw)
+    if (typeof parsed !== "object" || parsed === null) return {}
+    return parsed as Record<string, string>
+  } catch {
+    return {}
+  }
+}
+
 interface AppState {
   selectedProvider: ProviderName
   apiKeys: Record<string, string>
@@ -63,9 +77,11 @@ interface AppActions {
   reset: () => void
 }
 
+const persistedKeys = loadPersistedKeys()
+
 const initialState = {
   selectedProvider: "gemini" as ProviderName,
-  apiKeys: {} as Record<string, string>,
+  apiKeys: persistedKeys as Record<string, string>,
 
   currentPrompt: "",
   uploadedFile: null as File | null,
