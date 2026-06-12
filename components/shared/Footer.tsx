@@ -20,18 +20,18 @@ export default function Footer() {
               Docs
             </Link>
             <Link
-              href="https://github.com"
-              target="_blank"
-              className="text-[#888888] hover:text-white transition-colors text-sm"
-            >
-              GitHub
+            href="https://github.com/officialnullobjectweb/motiondrop"
+            target="_blank"
+            className="text-[#888888] hover:text-white transition-colors text-sm"
+          >
+            GitHub
             </Link>
             <Link
-              href="https://github.com"
-              target="_blank"
-              className="text-[#888888] hover:text-white transition-colors text-sm"
-            >
-              Report Bug
+            href="https://github.com/officialnullobjectweb/motiondrop/issues"
+            target="_blank"
+            className="text-[#888888] hover:text-white transition-colors text-sm"
+          >
+            Report Bug
             </Link>
           </div>
 

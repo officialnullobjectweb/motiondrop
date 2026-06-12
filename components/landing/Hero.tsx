@@ -34,7 +34,7 @@ export default function Hero() {
             Start Creating Free
           </Link>
           <Link
-            href="https://github.com"
+            href="https://github.com/officialnullobjectweb/motiondrop"
             target="_blank"
             className="text-white border border-white/20 hover:border-white/40 text-base font-medium px-8 py-3.5 rounded-full inline-flex items-center gap-2.5 transition-all"
           >

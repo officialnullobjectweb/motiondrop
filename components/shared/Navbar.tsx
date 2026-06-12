@@ -34,7 +34,7 @@ export default function Navbar() {
 
         <div className="hidden md:flex items-center gap-4">
           <Link
-            href="https://github.com"
+            href="https://github.com/officialnullobjectweb/motiondrop"
             target="_blank"
             className="text-[#888888] hover:text-white transition-colors"
           >
