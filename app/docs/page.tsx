@@ -1,47 +1,107 @@
-import { BookOpen, Key, Smartphone, Code2, Download, Lightbulb, ExternalLink } from "lucide-react"
+"use client"
 
-function Section({ icon: Icon, title, children }: { icon: any; title: string; children: React.ReactNode }) {
+import { BookOpen, Key, Smartphone, Code2, Download, Lightbulb, ExternalLink, Sparkles, Shield, Zap, Palette, ArrowUpRight } from "lucide-react"
+
+function Section({ icon: Icon, title, subtitle, children }: { icon: any; title: string; subtitle?: string; children: React.ReactNode }) {
   return (
-    <section className="space-y-4 scroll-mt-24" id={title.toLowerCase().replace(/\s+/g, "-")}>
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#6366F1]/10 flex items-center justify-center">
+    <section className="space-y-5 scroll-mt-20" id={title.toLowerCase().replace(/[\s/]+/g, "-").replace(/[^a-z0-9-]/g, "")}>
+      <div className="flex items-start gap-4">
+        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#6366F1]/20 to-[#8B5CF6]/10 flex items-center justify-center ring-1 ring-[#6366F1]/20 shrink-0">
           <Icon className="w-5 h-5 text-[#6366F1]" />
         </div>
-        <h2 className="text-lg font-semibold text-white">{title}</h2>
+        <div>
+          <h2 className="text-xl font-bold text-white">{title}</h2>
+          {subtitle && <p className="text-sm text-[#888888] mt-1 leading-relaxed">{subtitle}</p>}
+        </div>
       </div>
       {children}
     </section>
   )
 }
 
-function CodeBlock({ code }: { code: string }) {
+function CodeBlock({ code, language }: { code: string; language?: string }) {
   return (
-    <pre className="bg-[#0A0A0A] border border-[#222222] rounded-lg p-4 overflow-x-auto text-xs text-[#BBBBBB] font-mono leading-relaxed">
-      <code>{code}</code>
-    </pre>
+    <div className="group relative">
+      {language && (
+        <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 py-2 border-b border-[#222222] bg-[#0D0D0D] rounded-t-lg">
+          <span className="text-[10px] font-medium text-[#555555] uppercase tracking-wider">{language}</span>
+          <button
+            onClick={() => navigator.clipboard.writeText(code)}
+            className="text-[10px] text-[#555555] hover:text-white transition-colors"
+            aria-label={`Copy ${language} code`}
+          >
+            Copy
+          </button>
+        </div>
+      )}
+      <pre className={`bg-[#0A0A0A] border border-[#222222] rounded-lg overflow-x-auto text-xs text-[#BBBBBB] font-mono leading-relaxed ${language ? "pt-12" : "p-4"}`}>
+        <code>{code}</code>
+      </pre>
+    </div>
   )
 }
 
-function ProviderCard({ name, icon, url, steps }: { name: string; icon: string; url: string; steps: string[] }) {
+function ProviderCard({ name, icon, gradient, url, steps, note }: { name: string; icon: string; gradient: string; url: string; steps: string[]; note?: string }) {
   return (
-    <div className="bg-[#111111] border border-[#222222] rounded-lg p-4 space-y-3">
-      <div className="flex items-center gap-2">
-        <span className="text-lg">{icon}</span>
-        <h4 className="text-sm font-semibold text-white">{name}</h4>
+    <div className="group relative bg-[#111111] border border-[#222222] rounded-xl p-5 hover:border-[#333333] transition-all hover:shadow-lg hover:shadow-black/20">
+      <div className="flex items-center gap-3 mb-4">
+        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradient} bg-opacity-10 flex items-center justify-center text-lg`}>
+          {icon}
+        </div>
+        <div>
+          <h4 className="text-sm font-semibold text-white">{name}</h4>
+          {note && <p className="text-[10px] text-[#555555] mt-0.5">{note}</p>}
+        </div>
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="ml-auto text-[#6366F1] hover:text-[#818CF8] transition-colors"
+          aria-label={`Get ${name} API key`}
+        >
+          <ArrowUpRight className="w-4 h-4" />
+        </a>
       </div>
-      <ol className="list-decimal list-inside space-y-1.5">
+      <ol className="space-y-2">
         {steps.map((s, i) => (
-          <li key={i} className="text-xs text-[#888888] leading-relaxed">{s}</li>
+          <li key={i} className="flex items-start gap-2.5 text-xs text-[#888888] leading-relaxed">
+            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#6366F1]/10 text-[#6366F1] flex items-center justify-center text-[10px] font-medium mt-0.5">
+              {i + 1}
+            </span>
+            <span>{s}</span>
+          </li>
         ))}
       </ol>
-      <a
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-1 text-xs text-[#6366F1] hover:text-[#818CF8] transition-colors"
-      >
-        Open {name} console <ExternalLink className="w-3 h-3" />
-      </a>
+    </div>
+  )
+}
+
+function FormatCard({ icon: Icon, title, badge, children, color }: { icon: any; title: string; badge?: string; children: React.ReactNode; color: string }) {
+  return (
+    <div className="bg-[#111111] border border-[#222222] rounded-xl p-5 hover:border-[#333333] transition-all">
+      <div className="flex items-center gap-3 mb-3">
+        <div className={`w-10 h-10 rounded-lg ${color} flex items-center justify-center`}>
+          <Icon className="w-5 h-5" />
+        </div>
+        <h4 className="text-sm font-semibold text-white">{title}</h4>
+        {badge && (
+          <span className="text-[10px] bg-[#6366F1]/20 text-[#6366F1] px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider ml-auto">
+            {badge}
+          </span>
+        )}
+      </div>
+      <p className="text-xs text-[#888888] leading-relaxed">{children}</p>
+    </div>
+  )
+}
+
+function Shortcut({ keys, desc }: { keys: string; desc: string }) {
+  return (
+    <div className="flex items-center gap-3 py-2 px-3 rounded-lg bg-[#0A0A0A] border border-[#222222]">
+      <kbd className="font-mono text-[11px] text-[#6366F1] bg-[#6366F1]/10 px-2.5 py-1 rounded-md min-w-[60px] text-center font-medium">
+        {keys}
+      </kbd>
+      <span className="text-xs text-[#888888]">{desc}</span>
     </div>
   )
 }
@@ -49,136 +109,174 @@ function ProviderCard({ name, icon, url, steps }: { name: string; icon: string; 
 export default function DocsPage() {
   return (
     <div className="min-h-screen bg-[#0A0A0A]">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-        <div className="flex items-center gap-3 mb-10">
-          <div className="w-12 h-12 rounded-2xl bg-[#6366F1]/10 flex items-center justify-center">
-            <BookOpen className="w-6 h-6 text-[#6366F1]" />
+      {/* Hero banner */}
+      <div className="relative overflow-hidden border-b border-[#222222]">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#6366F1]/5 to-transparent pointer-events-none" />
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#6366F1]/20 to-[#8B5CF6]/10 flex items-center justify-center ring-1 ring-[#6366F1]/20">
+              <BookOpen className="w-6 h-6 text-[#6366F1]" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-white tracking-tight">Documentation</h1>
+              <p className="text-sm text-[#888888]">Everything you need to get started with MotionDrop</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-white">Documentation</h1>
-            <p className="text-sm text-[#666666]">Everything you need to use MotionDrop</p>
+
+          <div className="flex flex-wrap gap-2 mt-6">
+            {[
+              { href: "#getting-your-free-api-key", label: "🔑 API Keys", desc: "Connect your AI provider" },
+              { href: "#how-to-use-your-lottie-file", label: "📱 Lottie Usage", desc: "Integrate animations" },
+              { href: "#understanding-the-output-formats", label: "📦 Formats", desc: "Choose the right export" },
+              { href: "#tips-for-better-results", label: "💡 Tips", desc: "Get the best results" },
+            ].map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="group flex items-center gap-2 text-xs text-[#888888] hover:text-white border border-[#222222] hover:border-[#6366F1]/50 rounded-full px-4 py-2 transition-all hover:bg-[#6366F1]/5"
+                aria-label={`Jump to ${link.desc}`}
+              >
+                <span>{link.label}</span>
+                <span className="text-[10px] text-[#555555] group-hover:text-[#888888] transition-colors hidden sm:inline">— {link.desc}</span>
+              </a>
+            ))}
           </div>
         </div>
+      </div>
 
-        {/* Quick nav */}
-        <div className="flex flex-wrap gap-2 mb-12 pb-6 border-b border-[#222222]">
-          {[
-            { href: "#getting-your-free-api-key", label: "API Keys" },
-            { href: "#how-to-use-your-lottie-file", label: "Lottie Usage" },
-            { href: "#understanding-the-output-formats", label: "Formats" },
-            { href: "#tips-for-better-results", label: "Tips" },
-          ].map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="text-xs text-[#888888] hover:text-white border border-[#222222] hover:border-[#444444] rounded-full px-3.5 py-1.5 transition-colors"
-            >
-              {link.label}
-            </a>
-          ))}
-        </div>
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="space-y-20">
 
-        <div className="space-y-16">
-
-          {/* Getting Your Free API Key */}
-          <Section icon={Key} title="Getting Your Free API Key">
-            <p className="text-sm text-[#888888] leading-relaxed">
-              MotionDrop needs an API key from an AI provider to generate animations. Your key stays in your browser and is never sent anywhere except directly to the provider you choose.
-            </p>
+          {/* ── API Keys Section ── */}
+          <Section
+            icon={Key}
+            title="Getting Your Free API Key"
+            subtitle="MotionDrop uses your own AI provider API key to generate animations. Your key stays in your browser — we never store it on any server."
+          >
+            <div className="bg-gradient-to-r from-[#6366F1]/10 via-[#8B5CF6]/5 to-transparent border border-[#6366F1]/20 rounded-xl p-5 flex items-start gap-4">
+              <Sparkles className="w-5 h-5 text-[#6366F1] shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm text-white font-medium mb-1">Quick start recommendation</p>
+                <p className="text-xs text-[#888888] leading-relaxed">
+                  Gemini and Groq offer <strong className="text-white">completely free</strong> API keys with generous rate limits.
+                  Start with one of these to test the tool, then add more providers later.
+                </p>
+              </div>
+            </div>
 
             <div className="grid gap-4">
               <ProviderCard
                 name="Gemini"
                 icon="✦"
+                gradient="from-[#4285F4]/20 to-[#34A853]/10"
                 url="https://aistudio.google.com/apikey"
+                note="Recommended — Free tier"
                 steps={[
-                  "Go to Google AI Studio and sign in with your Google account",
+                  "Visit Google AI Studio and sign in with your Google account",
                   "Click 'Get API Key' in the left sidebar",
-                  "Click 'Create API Key' and select your Google Cloud project",
-                  "Copy the generated key (starts with AIzaSy)",
-                  "Paste it into MotionDrop's API Key modal selecting 'Gemini' as provider",
+                  "Click 'Create API Key', select your Google Cloud project",
+                  "Copy your key (starts with AIzaSy)",
+                  "Open MotionDrop, click Connect API Key, select Gemini, paste your key",
+                  "Click 'Test Connection' to verify your key works",
                 ]}
               />
 
               <ProviderCard
                 name="Groq"
                 icon="⚡"
+                gradient="from-[#F97316]/20 to-[#FDBA74]/10"
                 url="https://console.groq.com/keys"
+                note="Free tier available"
                 steps={[
-                  "Go to the Groq console and sign in or create an account",
-                  "Navigate to API Keys in the sidebar",
-                  "Click 'Create API Key'",
-                  "Copy the key (starts with gsk_)",
-                  "Select 'Groq' in MotionDrop and paste your key",
+                  "Go to the Groq console and create a free account",
+                  "Navigate to API Keys in the sidebar menu",
+                  "Click 'Create API Key', give it a name",
+                  "Copy your key (starts with gsk_)",
+                  "In MotionDrop, select Groq as your provider and paste the key",
+                  "Verify with 'Test Connection'",
                 ]}
               />
 
-              <ProviderCard
-                name="OpenRouter"
-                icon="◎"
-                url="https://openrouter.ai/keys"
-                steps={[
-                  "Visit OpenRouter and sign in with your Google or GitHub account",
-                  "Go to Keys page",
-                  "Click 'Create Key'",
-                  "Copy the key (starts with sk-or-v1-)",
-                  "Select 'OpenRouter' in MotionDrop and paste your key",
-                ]}
-              />
+              <details className="group">
+                <summary className="cursor-pointer text-sm text-[#6366F1] hover:text-[#818CF8] transition-colors font-medium py-2">
+                  Other providers (OpenRouter, OpenAI, Anthropic)
+                  <span className="ml-1 text-xs opacity-60 group-open:hidden">▼</span>
+                  <span className="ml-1 text-xs opacity-60 hidden group-open:inline">▲</span>
+                </summary>
+                <div className="mt-4 space-y-4">
+                  <ProviderCard
+                    name="OpenRouter"
+                    icon="◎"
+                    gradient="from-[#8B5CF6]/20 to-[#A78BFA]/10"
+                    url="https://openrouter.ai/keys"
+                    note="Access 200+ models with one key"
+                    steps={[
+                      "Visit OpenRouter and sign in with Google or GitHub",
+                      "Go to the Keys page from the sidebar",
+                      "Click 'Create Key' and copy it (starts with sk-or-v1-)",
+                      "Paste into MotionDrop and select OpenRouter",
+                    ]}
+                  />
 
-              <ProviderCard
-                name="OpenAI"
-                icon="◆"
-                url="https://platform.openai.com/api-keys"
-                steps={[
-                  "Go to the OpenAI platform and sign in",
-                  "Navigate to API Keys in the left sidebar",
-                  "Click 'Create new secret key'",
-                  "Copy the key (starts with sk-proj- or sk-)",
-                  "Select 'OpenAI' in MotionDrop and paste your key",
-                  "Note: OpenAI requires a paid account with credits",
-                ]}
-              />
+                  <ProviderCard
+                    name="OpenAI"
+                    icon="◆"
+                    gradient="from-[#10A37F]/20 to-[#2EC4B6]/10"
+                    url="https://platform.openai.com/api-keys"
+                    note="Paid account required"
+                    steps={[
+                      "Go to platform.openai.com and sign in",
+                      "Navigate to API Keys in settings",
+                      "Click 'Create new secret key'",
+                      "Copy your key (starts with sk-proj- or sk-)",
+                      "Note: OpenAI requires a paid account with pre-loaded credits",
+                    ]}
+                  />
 
-              <ProviderCard
-                name="Anthropic"
-                icon="▲"
-                url="https://console.anthropic.com/settings/keys"
-                steps={[
-                  "Go to the Anthropic console and sign in",
-                  "Navigate to Settings > API Keys",
-                  "Click 'Create Key'",
-                  "Copy the key (starts with sk-ant-)",
-                  "Select 'Anthropic' in MotionDrop and paste your key",
-                ]}
-              />
+                  <ProviderCard
+                    name="Anthropic"
+                    icon="▲"
+                    gradient="from-[#D97706]/20 to-[#F59E0B]/10"
+                    url="https://console.anthropic.com/settings/keys"
+                    note="Excellent for creative tasks"
+                    steps={[
+                      "Visit the Anthropic console and sign in",
+                      "Go to Settings > API Keys",
+                      "Click 'Create Key' and copy it (starts with sk-ant-)",
+                      "Paste into MotionDrop with Anthropic selected",
+                    ]}
+                  />
+                </div>
+              </details>
             </div>
 
-            <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4 mt-2">
-              <p className="text-xs text-yellow-400 leading-relaxed">
-                <strong>Security note:</strong> API keys are stored in plain text in your browser&apos;s localStorage.
-                They are never sent to any server except the AI provider you select.
-                For maximum security, generate a new key just for MotionDrop and revoke it when not in use.
+            <div className="bg-gradient-to-r from-yellow-500/5 to-transparent border border-yellow-500/15 rounded-xl p-4 flex items-start gap-3">
+              <Shield className="w-4 h-4 text-yellow-500 shrink-0 mt-0.5" />
+              <p className="text-xs text-yellow-400/80 leading-relaxed">
+                <strong className="text-yellow-400">Security:</strong> Your API key stays in your browser&apos;s localStorage.
+                It is never sent to any server except the AI provider you choose. We recommend generating a dedicated
+                key for MotionDrop that you can revoke when not in use.
               </p>
             </div>
           </Section>
 
-          {/* How to Use Your Lottie File */}
-          <Section icon={Smartphone} title="How to Use Your Lottie File">
-            <p className="text-sm text-[#888888] leading-relaxed">
-              Lottie is a lightweight, scalable animation format that works across all platforms.
-              Here is how to integrate your exported .json file in different environments.
-            </p>
-
+          {/* ── Lottie Usage Section ── */}
+          <Section
+            icon={Smartphone}
+            title="How to Use Your Lottie File"
+            subtitle="Lottie is a lightweight, scalable animation format that works beautifully across all platforms. Here is how to integrate your exported .json file."
+          >
             <div className="space-y-6">
               <div>
-                <h3 className="text-sm font-medium text-white mb-2">React / Next.js (Web)</h3>
-                <p className="text-xs text-[#888888] mb-2">Using the lottie-web library:</p>
+                <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                  <Code2 className="w-4 h-4 text-[#6366F1]" />
+                  React / Next.js
+                </h3>
                 <CodeBlock
+                  language="tsx"
                   code={`npm install lottie-web
 
 import { useEffect, useRef } from "react"
-import lottie from "lottie-web"
 
 export default function SplashScreen() {
   const container = useRef<HTMLDivElement>(null)
@@ -190,7 +288,7 @@ export default function SplashScreen() {
       renderer: "svg",
       loop: true,
       autoplay: true,
-      path: "/animations/splash.json", // your exported file
+      path: "/splash.json", // ← your exported Lottie file
     })
     return () => anim.destroy()
   }, [])
@@ -201,9 +299,12 @@ export default function SplashScreen() {
               </div>
 
               <div>
-                <h3 className="text-sm font-medium text-white mb-2">React Native</h3>
-                <p className="text-xs text-[#888888] mb-2">Using the lottie-react-native library:</p>
+                <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                  <Smartphone className="w-4 h-4 text-[#6366F1]" />
+                  React Native
+                </h3>
                 <CodeBlock
+                  language="tsx"
                   code={`npm install lottie-react-native
 
 import LottieView from "lottie-react-native"
@@ -215,7 +316,7 @@ export default function SplashScreen() {
   return (
     <LottieView
       ref={animation}
-      source={require("./splash.json")}
+      source={require("./splash.json")} // ← your exported file
       autoPlay
       loop
       style={{ width: "100%", height: "100%" }}
@@ -226,9 +327,12 @@ export default function SplashScreen() {
               </div>
 
               <div>
-                <h3 className="text-sm font-medium text-white mb-2">iOS (Swift)</h3>
-                <p className="text-xs text-[#888888] mb-2">Using Lottie for iOS via Swift Package Manager:</p>
+                <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                  <svg className="w-4 h-4 text-[#6366F1]" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7v10l10 5 10-5V7L12 2z" stroke="currentColor" strokeWidth="1.5"/><path d="M2 7l10 5 10-5M12 22V12" stroke="currentColor" strokeWidth="1.5"/></svg>
+                  iOS (Swift)
+                </h3>
                 <CodeBlock
+                  language="swift"
                   code={`import Lottie
 
 class SplashViewController: UIViewController {
@@ -251,34 +355,53 @@ class SplashViewController: UIViewController {
               </div>
 
               <div>
-                <h3 className="text-sm font-medium text-white mb-2">Android (Kotlin)</h3>
-                <p className="text-xs text-[#888888] mb-2">Using Lottie for Android via Gradle:</p>
+                <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                  <svg className="w-4 h-4 text-[#6366F1]" viewBox="0 0 24 24" fill="none"><path d="M4 4h16v16H4V4z" stroke="currentColor" strokeWidth="1.5"/><path d="M8 8h8v8H8V8z" stroke="currentColor" strokeWidth="1.5" opacity="0.5"/></svg>
+                  Android (Kotlin / Jetpack Compose)
+                </h3>
                 <CodeBlock
+                  language="kotlin"
                   code={`// build.gradle.kts
 dependencies {
   implementation("com.airbnb.android:lottie:6.6.0")
 }
 
-// activity_splash.xml
+// XML Layout
 <com.airbnb.lottie.LottieAnimationView
   android:id="@+id/animationView"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
   app:lottie_rawRes="@raw/splash"
   app:lottie_loop="true"
-  app:lottie_autoPlay="true" />`}
+  app:lottie_autoPlay="true" />
+
+// Or Jetpack Compose:
+@Composable
+fun SplashAnimation() {
+  val composition by rememberLottieComposition(
+    LottieCompositionSpec.RawRes(R.raw.splash)
+  )
+  LottieAnimation(
+    composition = composition,
+    iterations = LottieConstants.IterateForever
+  )
+}`}
                 />
               </div>
 
               <div>
-                <h3 className="text-sm font-medium text-white mb-2">Plain HTML / Vanilla JS</h3>
+                <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                  <svg className="w-4 h-4 text-[#6366F1]" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5"/><path d="M12 7v5l3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                  Plain HTML (Works everywhere)
+                </h3>
                 <CodeBlock
+                  language="html"
                   code={`<!DOCTYPE html>
 <html>
 <head>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"><\/script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
 </head>
-<body>
+<body style="margin:0">
   <div id="animation" style="width:100vw;height:100vh"></div>
   <script>
     lottie.loadAnimation({
@@ -288,7 +411,7 @@ dependencies {
       autoplay: true,
       path: "./splash.json"
     })
-  <\/script>
+  </script>
 </body>
 </html>`}
                 />
@@ -296,148 +419,138 @@ dependencies {
             </div>
           </Section>
 
-          {/* Understanding the Output Formats */}
-          <Section icon={Download} title="Understanding the Output Formats">
-            <p className="text-sm text-[#888888] leading-relaxed">
-              MotionDrop supports four export formats, each best suited for different use cases.
-            </p>
-
+          {/* ── Formats Section ── */}
+          <Section
+            icon={Download}
+            title="Understanding the Output Formats"
+            subtitle="Each export format serves a different purpose. Here is when to use which one."
+          >
             <div className="grid gap-3">
-              <div className="bg-[#111111] border border-[#222222] rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-[#6366F1] text-sm font-bold">{ }</span>
-                  <h4 className="text-sm font-semibold text-white">Lottie JSON</h4>
-                  <span className="text-[10px] bg-[#6366F1]/20 text-[#6366F1] px-2 py-0.5 rounded-full font-medium">RECOMMENDED</span>
-                </div>
-                <p className="text-xs text-[#888888] leading-relaxed">
-                  Best for production mobile and web apps. Vector-based so it scales perfectly to any screen size.
-                  Extremely small file size. Can be edited in After Effects via the Bodymovin plugin.
-                </p>
-              </div>
+              <FormatCard icon={Code2} title="Lottie JSON" badge="Recommended" color="bg-[#6366F1]/10 text-[#6366F1]">
+                Best for production apps. Vector-based — scales perfectly to any screen size. Extremely small file size.
+                Can be edited in After Effects via Bodymovin. <strong className="text-white">Use this for mobile apps, web apps, and production.</strong>
+              </FormatCard>
 
-              <div className="bg-[#111111] border border-[#222222] rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-emerald-500 text-sm font-bold">GIF</span>
-                  <h4 className="text-sm font-semibold text-white">Animated GIF</h4>
-                </div>
-                <p className="text-xs text-[#888888] leading-relaxed">
-                  Works everywhere with zero setup — no libraries, no code. Best for social media,
-                  presentations, and places where you can&apos;t install anything. Larger file size and lower quality.
-                </p>
-              </div>
+              <FormatCard icon={() => <span className="text-emerald-500 text-sm font-bold">GIF</span>} title="Animated GIF" color="bg-emerald-500/10 text-emerald-500">
+                Works everywhere with zero setup — no libraries, no code needed. Best for social media, presentations,
+                and platforms that only accept images. <strong className="text-white">Larger file size, lower quality — use for sharing, not production.</strong>
+              </FormatCard>
 
-              <div className="bg-[#111111] border border-[#222222] rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-rose-500 text-sm font-bold">MP4</span>
-                  <h4 className="text-sm font-semibold text-white">MP4 Video</h4>
-                </div>
-                <p className="text-xs text-[#888888] leading-relaxed">
-                  Best for video editing pipelines, demo reels, and social media ads. Compatible with
-                  Premiere Pro, Final Cut, CapCut, and all video players. Small file size with good quality.
-                </p>
-              </div>
+              <FormatCard icon={() => <span className="text-rose-500 text-sm font-bold">MP4</span>} title="MP4 Video" color="bg-rose-500/10 text-rose-500">
+                Standard video format compatible with every video player and editor. Best for video editing pipelines
+                (Premiere Pro, Final Cut, CapCut), demo reels, and social media ads.
+                <strong className="text-white"> Use for video content and presentations.</strong>
+              </FormatCard>
 
-              <div className="bg-[#111111] border border-[#222222] rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-amber-500 text-sm font-bold">CSS</span>
-                  <h4 className="text-sm font-semibold text-white">CSS Animation</h4>
-                </div>
-                <p className="text-xs text-[#888888] leading-relaxed">
-                  Self-contained CSS file with @keyframes. Drop it into any HTML page for a working animation
-                  with zero JavaScript. Best for web-only projects where you want maximum simplicity.
-                </p>
-              </div>
+              <FormatCard icon={() => <span className="text-amber-500 text-sm font-bold">CSS</span>} title="CSS Animation" color="bg-amber-500/10 text-amber-500">
+                Self-contained CSS file with @keyframes. Drop it into any HTML page for a working animation with
+                zero JavaScript. <strong className="text-white">Best for simple web embeds and landing pages.</strong>
+              </FormatCard>
             </div>
           </Section>
 
-          {/* Tips for Better Results */}
-          <Section icon={Lightbulb} title="Tips for Better Results">
-            <p className="text-sm text-[#888888] leading-relaxed">
-              The more information you give, the better the result. Here is how to write prompts that produce stunning animations.
-            </p>
-
-            <div className="space-y-4">
-              <div className="bg-[#111111] border border-[#222222] rounded-lg p-4">
-                <h4 className="text-sm font-medium text-white mb-2">Include these details for best results:</h4>
-                <ul className="space-y-1.5">
+          {/* ── Tips Section ── */}
+          <Section
+            icon={Lightbulb}
+            title="Tips for Better Results"
+            subtitle="The more context you give, the better the animation. Here is how to write prompts that shine."
+          >
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="bg-gradient-to-br from-[#6366F1]/5 to-transparent border border-[#222222] rounded-xl p-5">
+                <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-[#6366F1]" />
+                  What to include
+                </h4>
+                <ul className="space-y-2.5">
                   {[
-                    "Brand name: \"FitPro\", \"PayFlow\", \"Serenity\" — capitalize it clearly",
-                    "Industry: \"fitness app\", \"fintech\", \"meditation app\" — helps set the right mood",
-                    "Colors: \"blue and white\", \"dark purple\", \"neon green\" — or let AI choose for the industry",
-                    "Energy: \"energetic\", \"calm\", \"professional\", \"playful\" — sets the motion feel",
-                    "Reference: \"like Nike ads\", \"Apple-style\", \"minimal\" — helps style matching",
-                  ].map((tip, i) => (
-                    <li key={i} className="text-xs text-[#888888] flex items-start gap-2">
-                      <span className="text-[#6366F1] mt-0.5">✦</span>
-                      {tip}
+                    { label: "Brand name", tip: "Make it clear: 'FitPro', 'PayFlow', 'Serenity'" },
+                    { label: "Industry", tip: "Sets the mood: 'fitness app', 'fintech', 'meditation'" },
+                    { label: "Colors", tip: "Let AI choose or specify: 'blue and white', 'neon green'" },
+                    { label: "Energy", tip: "Drives motion: 'energetic', 'calm', 'professional'" },
+                    { label: "Reference", tip: "Style cues: 'Apple-style', 'minimal', 'bold'" },
+                  ].map((item) => (
+                    <li key={item.label} className="flex items-start gap-2 text-xs text-[#888888]">
+                      <span className="text-[#6366F1] font-medium shrink-0 w-20">{item.label}</span>
+                      <span className="text-[#666666]">— {item.tip}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="bg-[#111111] border border-[#222222] rounded-lg p-4">
-                <h4 className="text-sm font-medium text-white mb-2">Example prompts that work well:</h4>
-                <div className="space-y-2">
+              <div className="bg-gradient-to-br from-[#8B5CF6]/5 to-transparent border border-[#222222] rounded-xl p-5">
+                <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                  <Palette className="w-4 h-4 text-[#8B5CF6]" />
+                  Example prompts
+                </h4>
+                <div className="space-y-2.5">
                   {[
-                    { prompt: "Fitness app called FitPro, blue and white color scheme, energetic and motivating", result: "High-energy fitness splash with bold typography and dynamic particles" },
-                    { prompt: "Meditation app called Serenity, purple and gold, calm and peaceful", result: "Slow, gentle animation with soft gradient and floating particles" },
-                    { prompt: "Fintech app PayFlow, dark blue, professional trustworthy feel", result: "Clean, precise animation with grid background and sharp transitions" },
-                    { prompt: "Gaming app, neon green and black, explosive energy", result: "Fast-paced animation with elastic easing and confetti particles" },
-                    { prompt: "Luxury fashion brand, gold on black, elegant minimal", result: "Minimal animation with sharp easing and subtle glow effects" },
-                  ].map((ex, i) => (
-                    <div key={i} className="bg-[#0A0A0A] border border-[#222222] rounded-lg p-3">
-                      <p className="text-xs text-white font-medium mb-1">&ldquo;{ex.prompt}&rdquo;</p>
-                      <p className="text-[10px] text-[#666666]">→ {ex.result}</p>
+                    { prompt: "Fitness app called FitPro, blue and white, energetic", result: "Bold type + dynamic particles" },
+                    { prompt: "Meditation app Serenity, purple gold, calm", result: "Soft gradient + floating dots" },
+                    { prompt: "Fintech PayFlow, dark blue, professional", result: "Clean grid + sharp transitions" },
+                    { prompt: "Gaming app, neon green black, explosive", result: "Fast motion + confetti burst" },
+                    { prompt: "Luxury brand, gold on black, elegant", result: "Minimal + sharp + subtle glow" },
+                  ].map((ex) => (
+                    <div key={ex.prompt} className="text-xs leading-relaxed">
+                      <span className="text-white">&ldquo;{ex.prompt}&rdquo;</span>
+                      <span className="text-[#555555]"> → </span>
+                      <span className="text-[#888888]">{ex.result}</span>
                     </div>
                   ))}
                 </div>
               </div>
+            </div>
 
-              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-                <h4 className="text-sm font-medium text-blue-400 mb-1">Pro Tips</h4>
-                <ul className="space-y-1 text-xs text-[#888888]">
-                  <li>• Upload a logo file (PNG/SVG) — the animation will center it and animate it in</li>
-                  <li>• Use Gemini (free) or Groq (free) for testing, then switch to a paid provider for production quality</li>
-                  <li>• After generation, tweak the speed and energy sliders — small changes make a big difference</li>
-                  <li>• Click Regenerate if you do not love the result — each generation is unique</li>
-                  <li>• Export as Lottie for apps, GIF for sharing, MP4 for video, CSS for web-only projects</li>
-                </ul>
+            <div className="bg-gradient-to-r from-blue-500/5 to-transparent border border-blue-500/15 rounded-xl p-5">
+              <h4 className="text-sm font-semibold text-blue-400 mb-3 flex items-center gap-2">
+                <Zap className="w-4 h-4" />
+                Pro tips
+              </h4>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {[
+                  "Upload a logo (PNG/SVG) — MotionDrop centers and animates it automatically",
+                  "Use Gemini or Groq (both free) for testing, then add paid providers later",
+                  "Tweak Speed and Energy sliders after generation — small changes have big impact",
+                  "Click Regenerate for a completely new take — each run is unique",
+                  "Export Lottie for apps, GIF for sharing, MP4 for video, CSS for web",
+                  "Use the Test Connection button to verify your API key before generating",
+                ].map((tip) => (
+                  <div key={tip} className="flex items-start gap-2 text-xs text-[#888888] leading-relaxed">
+                    <span className="text-blue-400 mt-0.5 shrink-0">✦</span>
+                    <span>{tip}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </Section>
 
-          {/* Keyboard Shortcuts */}
-          <Section icon={Code2} title="Keyboard Shortcuts">
-            <p className="text-sm text-[#888888] leading-relaxed">
-              When the app page is focused (and no input field is active), these shortcuts control the experience.
-            </p>
-            <div className="grid grid-cols-[130px_1fr] gap-x-6 gap-y-2.5 text-sm">
-              <span className="font-mono text-xs text-[#6366F1] bg-[#6366F1]/10 rounded px-2 py-1 inline-block text-center">Space</span>
-              <span className="text-[#888888]">Play / Pause animation</span>
-
-              <span className="font-mono text-xs text-[#6366F1] bg-[#6366F1]/10 rounded px-2 py-1 inline-block text-center">R</span>
-              <span className="text-[#888888]">Restart animation</span>
-
-              <span className="font-mono text-xs text-[#6366F1] bg-[#6366F1]/10 rounded px-2 py-1 inline-block text-center">L</span>
-              <span className="text-[#888888]">Toggle loop</span>
-
-              <span className="font-mono text-xs text-[#6366F1] bg-[#6366F1]/10 rounded px-2 py-1 inline-block text-center">1</span>
-              <span className="text-[#888888]">Switch to Portrait canvas</span>
-
-              <span className="font-mono text-xs text-[#6366F1] bg-[#6366F1]/10 rounded px-2 py-1 inline-block text-center">2</span>
-              <span className="text-[#888888]">Switch to Square canvas</span>
-
-              <span className="font-mono text-xs text-[#6366F1] bg-[#6366F1]/10 rounded px-2 py-1 inline-block text-center">3</span>
-              <span className="text-[#888888]">Switch to Desktop canvas</span>
-
-              <span className="font-mono text-xs text-[#6366F1] bg-[#6366F1]/10 rounded px-2 py-1 inline-block text-center">G</span>
-              <span className="text-[#888888]">Generate animation (when prompt is filled)</span>
-
-              <span className="font-mono text-xs text-[#6366F1] bg-[#6366F1]/10 rounded px-2 py-1 inline-block text-center">Escape</span>
-              <span className="text-[#888888]">Close modals and color picker</span>
+          {/* ── Shortcuts Section ── */}
+          <Section
+            icon={Code2}
+            title="Keyboard Shortcuts"
+            subtitle="Speed up your workflow with these shortcuts. Works when no input field is focused."
+          >
+            <div className="space-y-1.5">
+              <Shortcut keys="Space" desc="Play / Pause animation" />
+              <Shortcut keys="R" desc="Restart animation from the beginning" />
+              <Shortcut keys="L" desc="Toggle looping on / off" />
+              <Shortcut keys="1" desc="Switch canvas to Portrait (9:16)" />
+              <Shortcut keys="2" desc="Switch canvas to Square (1:1)" />
+              <Shortcut keys="3" desc="Switch canvas to Desktop (16:9)" />
+              <Shortcut keys="G" desc="Generate animation (when prompt is filled)" />
+              <Shortcut keys="Esc" desc="Close modals and color picker" />
             </div>
           </Section>
 
+        </div>
+
+        {/* Footer */}
+        <div className="mt-20 pt-8 border-t border-[#222222] text-center">
+          <p className="text-xs text-[#555555]">
+            Need more help?{" "}
+            <a href="https://github.com/officialnullobjectweb/motiondrop/issues" target="_blank" rel="noopener noreferrer" className="text-[#6366F1] hover:text-[#818CF8] transition-colors">
+              Open a GitHub issue
+            </a>
+          </p>
         </div>
       </div>
     </div>

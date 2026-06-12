@@ -17,8 +17,10 @@ export default function Navbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0A0A0A]/80 backdrop-blur-md border-b border-[#222222] overflow-hidden">
       <div className="max-w-7xl mx-auto flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="text-white text-lg font-bold tracking-tight">
-          Motion<span className="text-[#6366F1] animate-drop-struggle">Drop</span>
+        <Link href="/" className="text-white text-lg font-bold tracking-tight group">
+          <span className="inline-block animate-motion-slide">Motion</span>
+          <span className="inline-block text-[#6366F1] animate-drop-lands animate-logo-idle">Drop</span>
+          {/* Drop: entrance plays once, then idle glow loops automatically after 2.8s */}
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
