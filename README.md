@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MotionDrop
 
-## Getting Started
+AI-powered splash screen animation generator. Describe your brand in plain English and get a production-ready Lottie animation in seconds. Supports export to Lottie JSON, GIF, MP4, and CSS. Built with Next.js, TypeScript, and Tailwind CSS. No design skills needed.
 
-First, run the development server:
+## How to Run Locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Getting API Keys
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+MotionDrop uses AI providers to generate animations. You need a free API key from one of these services:
 
-## Learn More
+| Provider | Get Key |
+|----------|---------|
+| **Gemini** (recommended) | [https://aistudio.google.com/apikey](https://aistudio.google.com/apikey) |
+| **OpenRouter** | [https://openrouter.ai/keys](https://openrouter.ai/keys) |
+| **Groq** | [https://console.groq.com/keys](https://console.groq.com/keys) |
+| **OpenAI** | [https://platform.openai.com/api-keys](https://platform.openai.com/api-keys) |
+| **Anthropic** | [https://console.anthropic.com/settings/keys](https://console.anthropic.com/settings/keys) |
 
-To learn more about Next.js, take a look at the following resources:
+Keys are stored in your browser's localStorage and are never sent to our servers.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Using Lottie Output
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The Lottie JSON export can be used with:
 
-## Deploy on Vercel
+- **LottieFiles** — upload to [lottiefiles.com](https://lottiefiles.com) for preview and sharing
+- **Lottie-web** — render with the [lottie-web](https://github.com/airbnb/lottie-web) player
+- **After Effects** — import via the [Bodymovin](https://aescripts.com/bodymovin/) extension
+- **React Native** — use [lottie-react-native](https://github.com/lottie-react-native/lottie-react-native)
+- **Rive** — convert via [rive.app](https://rive.app)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Tech Stack
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Next.js](https://nextjs.org) — React framework
+- [TypeScript](https://www.typescriptlang.org) — Type safety
+- [Tailwind CSS](https://tailwindcss.com) — Styling
+- [Zustand](https://github.com/pmndrs/zustand) — State management
+- [lottie-web](https://github.com/airbnb/lottie-web) — Lottie rendering
+- [gif.js](https://github.com/jnordberg/gif.js) — GIF export
+- [Sonner](https://sonner.emilkowal.ski) — Toast notifications
+
+## License
+
+MIT
