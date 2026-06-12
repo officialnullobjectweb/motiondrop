@@ -7,7 +7,7 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col items-center md:items-start gap-1">
             <Link href="/" className="text-white text-base font-bold tracking-tight">
-              Motion<span className="text-[#6366F1]">Drop</span>
+              Motion<span className="text-[#6366F1]">&nbsp;Drop</span>
             </Link>
             <span className="text-[#888888] text-xs">Free and open source forever</span>
           </div>
