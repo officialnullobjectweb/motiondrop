@@ -17,11 +17,11 @@ export default function Home() {
       </a>
 
       <Navbar />
-      <main id="main-content" className="flex-1" role="main">
-        <Hero />
-        <ExampleAnimations />
-        <HowItWorks />
-        <SitemapSection />
+      <main id="main-content" className="flex-1 snap-y snap-mandatory" role="main">
+        <section className="snap-start snap-always min-h-screen"><Hero /></section>
+        <section className="snap-start snap-always min-h-screen"><ExampleAnimations /></section>
+        <section className="snap-start snap-always min-h-screen"><HowItWorks /></section>
+        <section className="snap-start snap-always"><SitemapSection /></section>
       </main>
       <Footer />
     </>
