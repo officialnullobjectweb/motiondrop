@@ -43,7 +43,7 @@ export default function ExportPanel({
     <div className="border border-[#222222] rounded-xl bg-[#111111]/80 p-4 space-y-3">
       <h3 className="text-sm font-medium text-white">Export</h3>
 
-      <div className="grid grid-cols-2 gap-2">
+      <div className="flex flex-col gap-2">
         {FORMATS.map((fmt) => {
           const Icon = fmt.icon
           const active = currentFormat === fmt.key
@@ -54,8 +54,13 @@ export default function ExportPanel({
               key={fmt.key}
               onClick={handlers[fmt.key]}
               disabled={disabled}
-              className={`flex items-center gap-2.5 rounded-lg border bg-[#0A0A0A] px-3 py-2.5 text-left transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 ${fmt.color}`}
+              className={`flex items-center gap-2.5 rounded-lg border bg-[#0A0A0A] px-3 py-2.5 text-left transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 ${fmt.color} relative`}
             >
+              {fmt.key === "lottie" && (
+                <span className="absolute -top-2 -right-2 bg-[#6366F1] text-white text-[9px] font-semibold px-1.5 py-0.5 rounded-full uppercase tracking-wider">
+                  Recommended
+                </span>
+              )}
               <div className="shrink-0">
                 {active && isExporting ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

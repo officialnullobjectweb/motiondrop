@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useRef } from "react"
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary"
 import APIKeyInput from "@/components/app/APIKeyInput"
 import ProviderSelector from "@/components/app/ProviderSelector"
 import PromptInput from "@/components/app/PromptInput"
@@ -77,33 +78,6 @@ export default function AppContent() {
     }
   }, [loadAnimation])
 
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
-      if (!hasConfig) return
-      switch (e.code) {
-        case "Space":
-          e.preventDefault()
-          if (controls.isPlaying) controls.pause()
-          else controls.play()
-          break
-        case "KeyR":
-          e.preventDefault()
-          controls.restart()
-          controls.play()
-          break
-        case "KeyL":
-          e.preventDefault()
-          const next = !isLooping
-          controls.setLooping(next)
-          setIsLooping(next)
-          break
-      }
-    }
-    window.addEventListener("keydown", handler)
-    return () => window.removeEventListener("keydown", handler)
-  }, [hasConfig, controls, isLooping, setIsLooping])
-
   const runGeneration = useCallback(async (p: string, size: string, provider: string, keys: Record<string, string>) => {
     setIsGenerating(true)
     setGenerationError(null)
@@ -159,6 +133,9 @@ export default function AppContent() {
     }
   }, [setIsGenerating, setGenerationError, setCurrentConfig, setCurrentKeyframes, loadAnimation])
 
+  const setSelectedSize = useAppStore((s) => s.setSelectedSize)
+  const setEditorOpen = useAppStore((s) => s.setEditorOpen)
+
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) {
       toastWarning("Enter a prompt first")
@@ -194,6 +171,67 @@ export default function AppContent() {
     setPlaybackSpeed(value)
   }, [controls, setPlaybackSpeed])
 
+  // Keyboard shortcuts (defined after all callbacks to avoid Temporal Dead Zone)
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+
+      // Global shortcuts (always available)
+      switch (e.code) {
+        case "Digit1":
+        case "Numpad1":
+          e.preventDefault()
+          setSelectedSize("portrait")
+          break
+        case "Digit2":
+        case "Numpad2":
+          e.preventDefault()
+          setSelectedSize("square")
+          break
+        case "Digit3":
+        case "Numpad3":
+          e.preventDefault()
+          setSelectedSize("desktop")
+          break
+        case "KeyG":
+          if (prompt.trim() && !isGenerating) {
+            e.preventDefault()
+            handleGenerate()
+          }
+          break
+        case "Escape":
+          e.preventDefault()
+          setEditorOpen(false)
+          break
+        default:
+          break
+      }
+
+      // Playback shortcuts (only when animation loaded)
+      if (!hasConfig) return
+      switch (e.code) {
+        case "Space":
+          e.preventDefault()
+          if (controls.isPlaying) controls.pause()
+          else controls.play()
+          break
+        case "KeyR":
+          e.preventDefault()
+          controls.restart()
+          controls.play()
+          break
+        case "KeyL":
+          e.preventDefault()
+          const next = !isLooping
+          controls.setLooping(next)
+          setIsLooping(next)
+          break
+      }
+    }
+    window.addEventListener("keydown", handler)
+    return () => window.removeEventListener("keydown", handler)
+  }, [hasConfig, controls, isLooping, setIsLooping, prompt, isGenerating, handleGenerate, setSelectedSize, setEditorOpen])
+
   useEffect(() => {
     const unsubscribe = useAppStore.subscribe((state, prev) => {
       if (state.isGenerating && !prev.isGenerating) {
@@ -217,16 +255,18 @@ export default function AppContent() {
           </div>
 
           <div className="flex flex-col gap-4">
-            <CanvasPreview
-              canvasRef={canvasRef}
-              config={currentConfig}
-              isGenerating={isGenerating}
-              isPlaying={controls.isPlaying}
-              currentTime={controls.currentTime}
-              duration={controls.duration}
-              selectedSize={selectedSize}
-              generationError={generationError}
-            />
+            <ErrorBoundary>
+              <CanvasPreview
+                canvasRef={canvasRef}
+                config={currentConfig}
+                isGenerating={isGenerating}
+                isPlaying={controls.isPlaying}
+                currentTime={controls.currentTime}
+                duration={controls.duration}
+                selectedSize={selectedSize}
+                generationError={generationError}
+              />
+            </ErrorBoundary>
 
             {hasConfig && (
               <PlaybackControls

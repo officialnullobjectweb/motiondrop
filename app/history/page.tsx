@@ -24,8 +24,8 @@ export default function HistoryPage() {
             <History className="w-5 h-5 text-[#6366F1]" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold text-white">History</h1>
-            <p className="text-sm text-[#666666]">Your previously generated animations</p>
+            <h1 className="text-xl font-semibold text-white">Your Animations</h1>
+            <p className="text-sm text-[#666666]">Previously generated animations, ready to reuse or export</p>
           </div>
         </div>
 

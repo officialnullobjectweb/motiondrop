@@ -23,7 +23,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-[#0A0A0A]">
         {children}
         <Toaster
-          position="bottom-center"
+          position="bottom-right"
           toastOptions={{
             style: {
               background: "#1A1A1A",

@@ -1,6 +1,7 @@
 import Navbar from "@/components/shared/Navbar"
 import Hero from "@/components/landing/Hero"
 import HowItWorks from "@/components/landing/HowItWorks"
+import ExampleAnimations from "@/components/landing/ExampleAnimations"
 import Footer from "@/components/shared/Footer"
 
 export default function Home() {
@@ -9,6 +10,7 @@ export default function Home() {
       <Navbar />
       <main className="flex-1">
         <Hero />
+        <ExampleAnimations />
         <HowItWorks />
       </main>
       <Footer />
